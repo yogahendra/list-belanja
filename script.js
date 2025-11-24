@@ -5,6 +5,14 @@ let currentEditingMeal = null; // {day, meal}
 let currentIngredients = []; // Temporary storage for modal
 let editingIngredientId = null; // ID of ingredient being edited
 
+const baseMeals = {
+    sarapan: { label: 'Sarapan', placeholder: 'Sarapan' },
+    siang: { label: 'Makan Siang', placeholder: 'Makan Siang' },
+    malam: { label: 'Makan Malam', placeholder: 'Makan Malam' }
+};
+
+let customMealSlots = {};
+
 // Capacitor imports (will be undefined in browser)
 let App, Haptics, Keyboard, StatusBar;
 try {
@@ -80,19 +88,18 @@ function setupEventListeners() {
 
     // Meal input changes
     document.querySelectorAll('.meal-input').forEach(input => {
-        input.addEventListener('input', () => {
-            saveMealPlan();
-        });
+        if (!input.dataset.mealLabel && baseMeals[input.dataset.meal]) {
+            input.dataset.mealLabel = baseMeals[input.dataset.meal].label;
+        }
+        registerMealInput(input);
     });
 
     // Ingredient buttons
-    document.querySelectorAll('.btn-ingredient').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            hapticFeedback('light');
-            const day = btn.dataset.day;
-            const meal = btn.dataset.meal;
-            openIngredientModal(day, meal);
-        });
+    document.querySelectorAll('.btn-ingredient').forEach(registerIngredientButton);
+
+    // Add slot buttons
+    document.querySelectorAll('.btn-add-slot').forEach(btn => {
+        btn.addEventListener('click', () => handleAddSlot(btn.dataset.day));
     });
 
     // Generate shopping list button
@@ -187,6 +194,205 @@ function setupEventListeners() {
     loadTheme();
 }
 
+function registerMealInput(input) {
+    if (!input) return;
+    input.removeEventListener('input', onMealInputChange);
+    input.addEventListener('input', onMealInputChange);
+}
+
+function onMealInputChange() {
+    saveMealPlan();
+}
+
+function registerIngredientButton(btn) {
+    if (!btn) return;
+    btn.removeEventListener('click', onIngredientButtonClick);
+    btn.addEventListener('click', onIngredientButtonClick);
+}
+
+function onIngredientButtonClick(event) {
+    const btn = event.currentTarget;
+    if (!btn) return;
+    hapticFeedback('light');
+    const day = btn.dataset.day;
+    const meal = btn.dataset.meal;
+    openIngredientModal(day, meal);
+}
+
+function handleAddSlot(day) {
+    if (!day) return;
+    let label = prompt('Masukkan nama slot menu baru (contoh: Cemilan Sore)', 'Cemilan Sore');
+    if (label === null) return;
+    label = label.trim();
+    if (!label) {
+        label = 'Menu Tambahan';
+    }
+    const mealKey = generateCustomSlotId(day);
+    createMealSlotElement(day, mealKey, { label, isCustom: true });
+    if (!customMealSlots[day]) {
+        customMealSlots[day] = [];
+    }
+    customMealSlots[day].push({ id: mealKey, label });
+    saveCustomMealSlots();
+    saveMealPlan();
+}
+
+function generateCustomSlotId(day) {
+    return `custom-${day}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+}
+
+function createMealSlotElement(day, mealKey, options = {}) {
+    if (!day || !mealKey) return null;
+    const dayCard = document.querySelector(`.day-card[data-day="${day}"] .meal-inputs`);
+    if (!dayCard) return null;
+
+    const existingInput = dayCard.querySelector(`.meal-input[data-day="${day}"][data-meal="${mealKey}"]`);
+    if (existingInput) {
+        if (options.label && !existingInput.dataset.mealLabel) {
+            existingInput.dataset.mealLabel = options.label;
+        }
+        return existingInput;
+    }
+
+    const label = options.label || baseMeals[mealKey]?.label || 'Menu Tambahan';
+    const mealItem = document.createElement('div');
+    mealItem.classList.add('meal-item');
+    if (options.isCustom) {
+        mealItem.classList.add('custom-slot');
+    }
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = label;
+    input.classList.add('meal-input');
+    input.dataset.day = day;
+    input.dataset.meal = mealKey;
+    input.dataset.mealLabel = label;
+    mealItem.appendChild(input);
+
+    const ingredientBtn = document.createElement('button');
+    ingredientBtn.type = 'button';
+    ingredientBtn.classList.add('btn-ingredient');
+    ingredientBtn.dataset.day = day;
+    ingredientBtn.dataset.meal = mealKey;
+    ingredientBtn.title = 'Tambah Bahan';
+    ingredientBtn.textContent = '📝';
+    mealItem.appendChild(ingredientBtn);
+
+    if (options.isCustom) {
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.classList.add('btn-remove-slot');
+        removeBtn.setAttribute('aria-label', 'Hapus slot menu');
+        removeBtn.textContent = '✕';
+        removeBtn.addEventListener('click', () => removeCustomMealSlot(day, mealKey));
+        mealItem.appendChild(removeBtn);
+    }
+
+    dayCard.appendChild(mealItem);
+    registerMealInput(input);
+    registerIngredientButton(ingredientBtn);
+
+    if (!options.skipFocus && options.isCustom) {
+        input.focus();
+    }
+
+    return input;
+}
+
+function removeCustomMealSlot(day, mealKey) {
+    if (!day || !mealKey) return;
+    if (!confirm('Hapus slot menu tambahan ini?')) return;
+    const input = document.querySelector(`.meal-input[data-day="${day}"][data-meal="${mealKey}"]`);
+    if (input) {
+        const wrapper = input.closest('.meal-item');
+        if (wrapper) {
+            wrapper.remove();
+        }
+    }
+    delete mealPlan[`${day}_${mealKey}`];
+    if (customMealSlots[day]) {
+        customMealSlots[day] = customMealSlots[day].filter(slot => slot.id !== mealKey);
+        if (customMealSlots[day].length === 0) {
+            delete customMealSlots[day];
+        }
+    }
+    saveCustomMealSlots();
+    saveMealPlan();
+}
+
+function saveCustomMealSlots() {
+    localStorage.setItem('customMealSlots', JSON.stringify(customMealSlots));
+}
+
+function loadCustomMealSlots() {
+    const saved = localStorage.getItem('customMealSlots');
+    if (saved) {
+        try {
+            customMealSlots = JSON.parse(saved) || {};
+        } catch (e) {
+            customMealSlots = {};
+        }
+    }
+
+    Object.keys(customMealSlots).forEach(day => {
+        customMealSlots[day].forEach(slot => {
+            createMealSlotElement(day, slot.id, { label: slot.label, isCustom: true, skipFocus: true, skipSave: true });
+        });
+    });
+}
+
+function getMealLabel(day, mealKey) {
+    if (baseMeals[mealKey]) {
+        return baseMeals[mealKey].label;
+    }
+    const slots = customMealSlots[day] || [];
+    const slot = slots.find(s => s.id === mealKey);
+    if (slot) {
+        return slot.label;
+    }
+    const fallback = mealPlan[`${day}_${mealKey}`]?.slotLabel;
+    return fallback || 'Menu Tambahan';
+}
+
+function ensureSlotsForSavedMeals() {
+    Object.keys(mealPlan).forEach(key => {
+        const [day, ...rest] = key.split('_');
+        const mealKey = rest.join('_');
+        if (!day || !mealKey) return;
+
+        if (!document.querySelector(`.meal-input[data-day="${day}"][data-meal="${mealKey}"]`)) {
+            const label = mealPlan[key].slotLabel || getMealLabel(day, mealKey);
+            createMealSlotElement(day, mealKey, { label, isCustom: !baseMeals[mealKey], skipFocus: true });
+            if (!baseMeals[mealKey]) {
+                if (!customMealSlots[day]) {
+                    customMealSlots[day] = [];
+                }
+                if (!customMealSlots[day].some(slot => slot.id === mealKey)) {
+                    customMealSlots[day].push({ id: mealKey, label });
+                }
+            }
+        }
+    });
+    saveCustomMealSlots();
+}
+
+function getMealsForDay(day) {
+    const inputs = document.querySelectorAll(`.meal-input[data-day="${day}"]`);
+    return Array.from(inputs).map(input => {
+        const mealKey = input.dataset.meal;
+        const label = input.dataset.mealLabel || getMealLabel(day, mealKey);
+        const key = `${day}_${mealKey}`;
+        const mealData = mealPlan[key] || {};
+        return {
+            key: mealKey,
+            label,
+            name: input.value.trim() || mealData.name || '',
+            ingredients: mealData.ingredients || []
+        };
+    });
+}
+
 // Tab switching
 function switchTab(tabName) {
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -204,7 +410,8 @@ function switchTab(tabName) {
 function openIngredientModal(day, meal) {
     currentEditingMeal = { day, meal };
     const mealInput = document.querySelector(`[data-day="${day}"][data-meal="${meal}"]`);
-    const mealName = mealInput.value.trim() || 'Makanan';
+    const mealLabel = mealInput?.dataset.mealLabel || getMealLabel(day, meal);
+    const mealName = (mealInput?.value || '').trim() || mealLabel || 'Makanan';
     
     document.getElementById('modal-meal-name').textContent = mealName;
     document.getElementById('ingredient-modal').classList.add('active');
@@ -342,6 +549,7 @@ function saveIngredients() {
     }
     
     mealPlan[key].ingredients = [...currentIngredients];
+    mealPlan[key].slotLabel = getMealLabel(day, meal);
     saveMealPlan();
     closeIngredientModal();
 }
@@ -349,6 +557,7 @@ function saveIngredients() {
 // Save meal plan to localStorage
 function saveMealPlan() {
     // Also save meal names
+    const activeKeys = new Set();
     document.querySelectorAll('.meal-input').forEach(input => {
         const day = input.dataset.day;
         const meal = input.dataset.meal;
@@ -358,6 +567,14 @@ function saveMealPlan() {
             mealPlan[key] = {};
         }
         mealPlan[key].name = input.value.trim();
+        mealPlan[key].slotLabel = input.dataset.mealLabel || getMealLabel(day, meal);
+        activeKeys.add(key);
+    });
+    
+    Object.keys(mealPlan).forEach(key => {
+        if (!activeKeys.has(key)) {
+            delete mealPlan[key];
+        }
     });
     
     localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
@@ -368,15 +585,22 @@ function loadMealPlan() {
     const saved = localStorage.getItem('mealPlan');
     if (saved) {
         mealPlan = JSON.parse(saved);
+        ensureSlotsForSavedMeals();
         document.querySelectorAll('.meal-input').forEach(input => {
             const day = input.dataset.day;
             const meal = input.dataset.meal;
             const key = `${day}_${meal}`;
-            
-            if (mealPlan[key] && mealPlan[key].name) {
-                input.value = mealPlan[key].name;
+            if (mealPlan[key]) {
+                if (mealPlan[key].name) {
+                    input.value = mealPlan[key].name;
+                }
+                if (!input.dataset.mealLabel && mealPlan[key].slotLabel) {
+                    input.dataset.mealLabel = mealPlan[key].slotLabel;
+                }
             }
         });
+    } else {
+        mealPlan = {};
     }
 }
 
@@ -526,7 +750,25 @@ function clearMealPlan() {
         });
         mealPlan = {};
         localStorage.removeItem('mealPlan');
+        removeAllCustomMealSlots();
+        saveCustomMealSlots();
+        saveMealPlan();
     }
+}
+
+function removeAllCustomMealSlots() {
+    Object.keys(customMealSlots).forEach(day => {
+        customMealSlots[day].forEach(slot => {
+            const input = document.querySelector(`.meal-input[data-day="${day}"][data-meal="${slot.id}"]`);
+            if (input) {
+                const wrapper = input.closest('.meal-item');
+                if (wrapper) {
+                    wrapper.remove();
+                }
+            }
+        });
+    });
+    customMealSlots = {};
 }
 
 // Clear shopping list
@@ -540,6 +782,7 @@ function clearShoppingList() {
 
 // Load all data
 function loadData() {
+    loadCustomMealSlots();
     loadMealPlan();
     loadShoppingList();
 }
@@ -764,13 +1007,8 @@ function exportAsHTML() {
     hapticFeedback('medium');
     
     const days = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
-    const mealTypes = {
-        sarapan: 'Sarapan',
-        siang: 'Makan Siang',
-        malam: 'Makan Malam'
-    };
-    
     let hasMeals = false;
+    const dateStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     let htmlContent = `<!DOCTYPE html>
 <html lang="id">
 <head>
@@ -890,7 +1128,7 @@ function exportAsHTML() {
 <body>
     <div class="container">
         <h1>📋 Daftar Menu Mingguan</h1>
-        <div class="subtitle">${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+        <div class="subtitle">${dateStr}</div>
 `;
 
     days.forEach(day => {
@@ -898,16 +1136,14 @@ function exportAsHTML() {
         let dayHtml = '';
         let dayHasMeals = false;
         
-        Object.keys(mealTypes).forEach(mealType => {
-            const key = `${day}_${mealType}`;
-            const meal = mealPlan[key];
-            
-            if (meal && meal.name) {
+        const meals = getMealsForDay(day);
+        meals.forEach(meal => {
+            if (meal.name) {
                 dayHasMeals = true;
                 hasMeals = true;
                 dayHtml += `
                     <div class="meal-item">
-                        <div class="meal-type">${mealTypes[mealType]}</div>
+                        <div class="meal-type">${meal.label}</div>
                         <div class="meal-name">${escapeHtml(meal.name)}</div>`;
                 
                 if (meal.ingredients && meal.ingredients.length > 0) {
@@ -1001,11 +1237,6 @@ function exportAsPDF() {
     
     // Create temporary HTML for PDF
     const days = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
-    const mealTypes = {
-        sarapan: 'Sarapan',
-        siang: 'Makan Siang',
-        malam: 'Makan Malam'
-    };
     
     let hasMeals = false;
     const dateStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -1019,17 +1250,15 @@ function exportAsPDF() {
         const dayName = day.charAt(0).toUpperCase() + day.slice(1);
         let dayHtml = '';
         let dayHasMeals = false;
+        const meals = getMealsForDay(day);
         
-        Object.keys(mealTypes).forEach(mealType => {
-            const key = `${day}_${mealType}`;
-            const meal = mealPlan[key];
-            
-            if (meal && meal.name) {
+        meals.forEach(meal => {
+            if (meal.name) {
                 dayHasMeals = true;
                 hasMeals = true;
                 dayHtml += `
                     <div style="margin-bottom: 15px; padding: 12px; background: #f9f9f9; border-radius: 8px; border-left: 4px solid #ffa500;">
-                        <div style="font-weight: bold; color: #333; margin-bottom: 5px;">${mealTypes[mealType]}</div>
+                        <div style="font-weight: bold; color: #333; margin-bottom: 5px;">${meal.label}</div>
                         <div style="color: #555; margin-bottom: 8px;">${escapeHtml(meal.name)}</div>`;
                 
                 if (meal.ingredients && meal.ingredients.length > 0) {
@@ -1137,11 +1366,6 @@ function shareMenu() {
     hapticFeedback('medium');
     
     const days = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
-    const mealTypes = {
-        sarapan: 'Sarapan',
-        siang: 'Makan Siang',
-        malam: 'Makan Malam'
-    };
     
     const dateStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     let shareText = `📋 *DAFTAR MENU MINGGUAN*\n${dateStr}\n\n`;
@@ -1152,14 +1376,13 @@ function shareMenu() {
         let dayContent = [];
         let dayHasMeals = false;
         
-        Object.keys(mealTypes).forEach(mealType => {
-            const key = `${day}_${mealType}`;
-            const meal = mealPlan[key];
-            
-            if (meal && meal.name) {
+        const meals = getMealsForDay(day);
+        
+        meals.forEach(meal => {
+            if (meal.name) {
                 dayHasMeals = true;
                 hasMeals = true;
-                dayContent.push(`${mealTypes[mealType]}: ${meal.name}`);
+                dayContent.push(`${meal.label}: ${meal.name}`);
                 
                 if (meal.ingredients && meal.ingredients.length > 0) {
                     const ingList = meal.ingredients.map(ing => `${ing.name} (${ing.quantity})`).join(', ');
