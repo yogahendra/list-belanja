@@ -755,42 +755,49 @@ function exportAsHTML() {
         }
         .day-title {
             color: #ff6b6b;
-            font-size: 1.4em;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
+            font-size: 1.3em;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
             border-bottom: 2px solid #ff6b6b;
+            font-weight: 600;
         }
         .meal-item {
-            margin-bottom: 15px;
-            padding: 12px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            border-left: 4px solid #ffa500;
+            margin-bottom: 12px;
+            padding: 14px;
+            background: #fafafa;
+            border-radius: 6px;
+            border-left: 3px solid #ffa500;
         }
         .meal-type {
-            font-weight: bold;
+            font-weight: 600;
             color: #333;
-            font-size: 1.1em;
-            margin-bottom: 5px;
+            font-size: 0.95em;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .meal-name {
-            color: #555;
-            font-size: 1em;
-            margin-bottom: 8px;
+            color: #444;
+            font-size: 1.05em;
+            margin-bottom: 10px;
+            font-weight: 500;
         }
         .ingredients {
-            margin-top: 8px;
-            padding-left: 15px;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid #e0e0e0;
         }
         .ingredients-title {
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: #888;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
+            font-weight: 500;
         }
         .ingredient {
             font-size: 0.9em;
             color: #666;
-            margin: 3px 0;
+            margin: 4px 0;
+            padding-left: 8px;
         }
         .shopping-summary {
             margin-top: 40px;
@@ -822,7 +829,7 @@ function exportAsHTML() {
 </head>
 <body>
     <div class="container">
-        <h1>🛒 Daftar Menu Mingguan</h1>
+        <h1>📋 Daftar Menu Mingguan</h1>
         <div class="subtitle">${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
 `;
 
@@ -845,9 +852,9 @@ function exportAsHTML() {
                 
                 if (meal.ingredients && meal.ingredients.length > 0) {
                     dayHtml += '<div class="ingredients">';
-                    dayHtml += '<div class="ingredients-title">Bahan-bahan:</div>';
+                    dayHtml += '<div class="ingredients-title">Bahan:</div>';
                     meal.ingredients.forEach(ing => {
-                        dayHtml += `<div class="ingredient">• ${escapeHtml(ing.name)} (${escapeHtml(ing.quantity)})</div>`;
+                        dayHtml += `<div class="ingredient">• ${escapeHtml(ing.name)} - ${escapeHtml(ing.quantity)}</div>`;
                     });
                     dayHtml += '</div>';
                 }
@@ -895,7 +902,10 @@ function exportAsHTML() {
             <div class="shopping-title">📋 Ringkasan Bahan Belanja</div>`;
     
     if (ingredients.size > 0) {
-        Array.from(ingredients.values()).forEach(item => {
+        const sortedIngredients = Array.from(ingredients.values()).sort((a, b) => 
+            a.name.localeCompare(b.name, 'id')
+        );
+        sortedIngredients.forEach(item => {
             htmlContent += `<div class="shopping-item">• ${escapeHtml(item.name)} - ${escapeHtml(item.quantity)}</div>`;
         });
     } else {
@@ -938,10 +948,11 @@ function exportAsPDF() {
     };
     
     let hasMeals = false;
+    const dateStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     let printContent = `
         <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto;">
-            <h1 style="color: #ff6b6b; text-align: center; margin-bottom: 10px;">🛒 Daftar Menu Mingguan</h1>
-            <p style="text-align: center; color: #666; margin-bottom: 30px;">${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            <h1 style="color: #ff6b6b; text-align: center; margin-bottom: 8px; font-size: 1.8em;">📋 Daftar Menu Mingguan</h1>
+            <p style="text-align: center; color: #666; margin-bottom: 30px; font-size: 0.95em;">${dateStr}</p>
     `;
     
     days.forEach(day => {
@@ -962,10 +973,10 @@ function exportAsPDF() {
                         <div style="color: #555; margin-bottom: 8px;">${escapeHtml(meal.name)}</div>`;
                 
                 if (meal.ingredients && meal.ingredients.length > 0) {
-                    dayHtml += '<div style="margin-top: 8px; padding-left: 15px;">';
-                    dayHtml += '<div style="font-size: 0.9em; color: #888; margin-bottom: 5px;">Bahan-bahan:</div>';
+                    dayHtml += '<div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #e0e0e0;">';
+                    dayHtml += '<div style="font-size: 0.85em; color: #888; margin-bottom: 6px; font-weight: 500;">Bahan:</div>';
                     meal.ingredients.forEach(ing => {
-                        dayHtml += `<div style="font-size: 0.9em; color: #666; margin: 3px 0;">• ${escapeHtml(ing.name)} (${escapeHtml(ing.quantity)})</div>`;
+                        dayHtml += `<div style="font-size: 0.9em; color: #666; margin: 4px 0; padding-left: 8px;">• ${escapeHtml(ing.name)} - ${escapeHtml(ing.quantity)}</div>`;
                     });
                     dayHtml += '</div>';
                 }
@@ -1013,7 +1024,10 @@ function exportAsPDF() {
                 <h2 style="color: #ff6b6b; font-size: 1.5em; margin-bottom: 15px; text-align: center;">📋 Ringkasan Bahan Belanja</h2>`;
     
     if (ingredients.size > 0) {
-        Array.from(ingredients.values()).forEach(item => {
+        const sortedIngredients = Array.from(ingredients.values()).sort((a, b) => 
+            a.name.localeCompare(b.name, 'id')
+        );
+        sortedIngredients.forEach(item => {
             printContent += `<div style="padding: 8px; margin: 5px 0; background: white; border-radius: 5px;">• ${escapeHtml(item.name)} - ${escapeHtml(item.quantity)}</div>`;
         });
     }
@@ -1069,12 +1083,13 @@ function shareMenu() {
         malam: 'Makan Malam'
     };
     
-    let shareText = '🛒 *DAFTAR MENU MINGGUAN*\n\n';
+    const dateStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    let shareText = `📋 *DAFTAR MENU MINGGUAN*\n${dateStr}\n\n`;
     let hasMeals = false;
     
     days.forEach(day => {
         const dayName = day.charAt(0).toUpperCase() + day.slice(1);
-        let dayContent = '';
+        let dayContent = [];
         let dayHasMeals = false;
         
         Object.keys(mealTypes).forEach(mealType => {
@@ -1084,19 +1099,18 @@ function shareMenu() {
             if (meal && meal.name) {
                 dayHasMeals = true;
                 hasMeals = true;
-                dayContent += `${mealTypes[mealType]}: ${meal.name}\n`;
+                dayContent.push(`${mealTypes[mealType]}: ${meal.name}`);
                 
                 if (meal.ingredients && meal.ingredients.length > 0) {
-                    dayContent += 'Bahan: ';
                     const ingList = meal.ingredients.map(ing => `${ing.name} (${ing.quantity})`).join(', ');
-                    dayContent += ingList + '\n';
+                    dayContent.push(`Bahan: ${ingList}`);
                 }
-                dayContent += '\n';
             }
         });
         
         if (dayHasMeals) {
-            shareText += `*${dayName.toUpperCase()}*\n${dayContent}`;
+            shareText += `*${dayName.toUpperCase()}*\n`;
+            shareText += dayContent.join('\n') + '\n\n';
         }
     });
     
@@ -1126,10 +1140,13 @@ function shareMenu() {
         }
     });
     
-    shareText += '\n📋 *RINGKASAN BAHAN BELANJA*\n\n';
+    shareText += '📋 *RINGKASAN BAHAN BELANJA*\n\n';
     
     if (ingredients.size > 0) {
-        Array.from(ingredients.values()).forEach(item => {
+        const sortedIngredients = Array.from(ingredients.values()).sort((a, b) => 
+            a.name.localeCompare(b.name, 'id')
+        );
+        sortedIngredients.forEach(item => {
             shareText += `• ${item.name} - ${item.quantity}\n`;
         });
     }
@@ -1202,15 +1219,18 @@ function exportMealPlan() {
         malam: 'Makan Malam'
     };
     
-    let exportText = '='.repeat(60) + '\n';
-    exportText += 'DAFTAR MENU MAKANAN MINGGUAN\n';
-    exportText += '='.repeat(60) + '\n\n';
-    
     let hasMeals = false;
+    const dateStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    
+    let exportText = '═'.repeat(50) + '\n';
+    exportText += '    DAFTAR MENU MAKANAN MINGGUAN\n';
+    exportText += '═'.repeat(50) + '\n';
+    exportText += `    ${dateStr}\n`;
+    exportText += '═'.repeat(50) + '\n\n';
     
     days.forEach(day => {
         const dayName = day.charAt(0).toUpperCase() + day.slice(1);
-        let dayContent = '';
+        let dayContent = [];
         let dayHasMeals = false;
         
         Object.keys(mealTypes).forEach(mealType => {
@@ -1220,22 +1240,22 @@ function exportMealPlan() {
             if (meal && meal.name) {
                 dayHasMeals = true;
                 hasMeals = true;
-                dayContent += `  ${mealTypes[mealType]}: ${meal.name}\n`;
+                dayContent.push(`  ${mealTypes[mealType]}`);
+                dayContent.push(`  ${meal.name}`);
                 
                 if (meal.ingredients && meal.ingredients.length > 0) {
-                    dayContent += '    Bahan-bahan:\n';
                     meal.ingredients.forEach(ing => {
-                        dayContent += `      - ${ing.name} (${ing.quantity})\n`;
+                        dayContent.push(`    • ${ing.name} - ${ing.quantity}`);
                     });
                 }
-                dayContent += '\n';
+                dayContent.push('');
             }
         });
         
         if (dayHasMeals) {
             exportText += `${dayName.toUpperCase()}\n`;
-            exportText += '-'.repeat(60) + '\n';
-            exportText += dayContent;
+            exportText += '─'.repeat(50) + '\n';
+            exportText += dayContent.join('\n') + '\n';
         }
     });
     
@@ -1245,10 +1265,6 @@ function exportMealPlan() {
     }
     
     // Add shopping list summary
-    exportText += '\n' + '='.repeat(60) + '\n';
-    exportText += 'RINGKASAN BAHAN BELANJA\n';
-    exportText += '='.repeat(60) + '\n\n';
-    
     const ingredients = new Map();
     Object.keys(mealPlan).forEach(key => {
         const meal = mealPlan[key];
@@ -1269,13 +1285,23 @@ function exportMealPlan() {
         }
     });
     
+    exportText += '\n' + '═'.repeat(50) + '\n';
+    exportText += '    RINGKASAN BAHAN BELANJA\n';
+    exportText += '═'.repeat(50) + '\n\n';
+    
     if (ingredients.size > 0) {
-        Array.from(ingredients.values()).forEach(item => {
-            exportText += `- ${item.name} (${item.quantity})\n`;
+        const sortedIngredients = Array.from(ingredients.values()).sort((a, b) => 
+            a.name.localeCompare(b.name, 'id')
+        );
+        sortedIngredients.forEach(item => {
+            exportText += `  • ${item.name} - ${item.quantity}\n`;
         });
     } else {
-        exportText += 'Belum ada bahan yang ditambahkan.\n';
+        exportText += '  Belum ada bahan yang ditambahkan.\n';
     }
+    
+    exportText += '\n' + '─'.repeat(50) + '\n';
+    exportText += `  Dibuat: ${new Date().toLocaleDateString('id-ID')}\n`;
     
     // Create and download file
     const blob = new Blob([exportText], { type: 'text/plain;charset=utf-8' });
