@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="Rencanakan menu makanan seminggu ke depan dan buat daftar belanja dengan mudah">
+    <meta name="theme-color" content="#ff6b6b">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Daftar Belanja">
+    <title>Daftar Belanja Mingguan</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛒 Daftar Belanja Mingguan</h1>
+            <p>Rencanakan menu makanan seminggu ke depan dan buat daftar belanja dengan mudah</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="meal-plan">Daftar Makanan</button>
+            <button class="tab-btn" data-tab="shopping-list">Daftar Belanja</button>
+        </div>
+
+        <!-- Tab Daftar Makanan -->
+        <div id="meal-plan" class="tab-content active">
+            <div class="week-container">
+                <div class="day-card day-senin" data-day="senin">
+                    <h3>Senin</h3>
+                    <div class="meal-inputs">
+                        <div class="meal-item">
+                            <input type="text" placeholder="Sarapan" class="meal-input" data-day="senin" data-meal="sarapan">
+                            <button class="btn-ingredient" data-day="senin" data-meal="sarapan" title="Tambah Bahan">📝</button>
+                        </div>
+                        <div class="meal-item">
+                            <input type="text" placeholder="Makan Siang" class="meal-input" data-day="senin" data-meal="siang">
+                            <button class="btn-ingredient" data-day="senin" data-meal="siang" title="Tambah Bahan">📝</button>
+                        </div>
+                        <div class="meal-item">
+                            <input type="text" placeholder="Makan Malam" class="meal-input" data-day="senin" data-meal="malam">
+                            <button class="btn-ingredient" data-day="senin" data-meal="malam" title="Tambah Bahan">📝</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="day-card day-selasa" data-day="selasa">
+                    <h3>Selasa</h3>
+                    <div class="meal-inputs">
+                        <div class="meal-item">
+                            <input type="text" placeholder="Sarapan" class="meal-input" data-day="selasa" data-meal="sarapan">
+                            <button class="btn-ingredient" data-day="selasa" data-meal="sarapan" title="Tambah Bahan">📝</button>
+                        </div>
+                        <div class="meal-item">
+                            <input type="text" placeholder="Makan Siang" class="meal-input" data-day="selasa" data-meal="siang">
+                            <button class="btn-ingredient" data-day="selasa" data-meal="siang" title="Tambah Bahan">📝</button>
+                        </div>
+                        <div class="meal-item">
+                            <input type="text" placeholder="Makan Malam" class="meal-input" data-day="selasa" data-meal="malam">
+                            <button class="btn-ingredient" data-day="selasa" data-meal="malam" title="Tambah Bahan">📝</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="day-card day-rabu" data-day="rabu">
+                    <h3>Rabu</h3>
+                    <div class="meal-inputs">
+                        <div class="meal-item">
+                            <input type="text" placeholder="Sarapan" class="meal-input" data-day="rabu" data-meal="sarapan">
+                            <button class="btn-ingredient" data-day="rabu" data-meal="sarapan" title="Tambah Bahan">📝</button>
+                        </div>
+                        <div class="meal-item">
+                            <input type="text" placeholder="Makan Siang" class="meal-input" data-day="rabu" data-meal="siang">
+                            <button class="btn-ingredient" data-day="rabu" data-meal="siang" title="Tambah Bahan">📝</button>
+                        </div>
+                        <div class="meal-item">
+                            <input type="text" placeholder="Makan Malam" class="meal-input" data-day="rabu" data-meal="malam">
+                            <button class="btn-ingredient" data-day="rabu" data-meal="malam" title="Tambah Bahan">📝</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="day-card day-kamis" data-day="kamis">
+                    <h3>Kamis</h3>
+                    <div class="meal-inputs">
+                        <div class="meal-item">
+                            <input type="text" placeholder="Sarapan" class="meal-input" data-day="kamis" data-meal="sarapan">
+                            <button class="btn-ingredient" data-day="kamis" data-meal="sarapan" title="Tambah Bahan">📝</button>
+                        </div>
+                        <div class="meal-item">
+                            <input type="text" placeholder="Makan Siang" class="meal-input" data-day="kamis" data-meal="siang">
+                            <button class="btn-ingredient" data-day="kamis" data-meal="siang" title="Tambah Bahan">📝</button>
+                        </div>
+                        <div class="meal-item">
+                            <input type="text" placeholder="Makan Malam" class="meal-input" data-day="kamis" data-meal="malam">
+                            <button class="btn-ingredient" data-day="kamis" data-meal="malam" title="Tambah Bahan">📝</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="day-card day-jumat" data-day="jumat">
+                    <h3>Jumat</h3>
+                    <div class="meal-inputs">
+                        <div class="meal-item">
+                            <input type="text" placeholder="Sarapan" class="meal-input" data-day="jumat" data-meal="sarapan">
+                            <button class="btn-ingredient" data-day="jumat" data-meal="sarapan" title="Tambah Bahan">📝</button>
+                        </div>
+                        <div class="meal-item">
+                            <input type="text" placeholder="Makan Siang" class="meal-input" data-day="jumat" data-meal="siang">
+                            <button class="btn-ingredient" data-day="jumat" data-meal="siang" title="Tambah Bahan">📝</button>
+                        </div>
+                        <div class="meal-item">
+                            <input type="text" placeholder="Makan Malam" class="meal-input" data-day="jumat" data-meal="malam">
+                            <button class="btn-ingredient" data-day="jumat" data-meal="malam" title="Tambah Bahan">📝</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="day-card day-sabtu" data-day="sabtu">
+                    <h3>Sabtu</h3>
+                    <div class="meal-inputs">
+                        <div class="meal-item">
+                            <input type="text" placeholder="Sarapan" class="meal-input" data-day="sabtu" data-meal="sarapan">
+                            <button class="btn-ingredient" data-day="sabtu" data-meal="sarapan" title="Tambah Bahan">📝</button>
+                        </div>
+                        <div class="meal-item">
+                            <input type="text" placeholder="Makan Siang" class="meal-input" data-day="sabtu" data-meal="siang">
+                            <button class="btn-ingredient" data-day="sabtu" data-meal="siang" title="Tambah Bahan">📝</button>
+                        </div>
+                        <div class="meal-item">
+                            <input type="text" placeholder="Makan Malam" class="meal-input" data-day="sabtu" data-meal="malam">
+                            <button class="btn-ingredient" data-day="sabtu" data-meal="malam" title="Tambah Bahan">📝</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="day-card day-minggu" data-day="minggu">
+                    <h3>Minggu</h3>
+                    <div class="meal-inputs">
+                        <div class="meal-item">
+                            <input type="text" placeholder="Sarapan" class="meal-input" data-day="minggu" data-meal="sarapan">
+                            <button class="btn-ingredient" data-day="minggu" data-meal="sarapan" title="Tambah Bahan">📝</button>
+                        </div>
+                        <div class="meal-item">
+                            <input type="text" placeholder="Makan Siang" class="meal-input" data-day="minggu" data-meal="siang">
+                            <button class="btn-ingredient" data-day="minggu" data-meal="siang" title="Tambah Bahan">📝</button>
+                        </div>
+                        <div class="meal-item">
+                            <input type="text" placeholder="Makan Malam" class="meal-input" data-day="minggu" data-meal="malam">
+                            <button class="btn-ingredient" data-day="minggu" data-meal="malam" title="Tambah Bahan">📝</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button id="generate-btn" class="btn btn-primary">📋 Buat Daftar Belanja</button>
+                <button id="export-btn" class="btn btn-export">📥 Simpan Menu ke File</button>
+                <button id="clear-meals-btn" class="btn btn-secondary">🗑️ Hapus Semua</button>
+            </div>
+        </div>
+
+        <!-- Tab Daftar Belanja -->
+        <div id="shopping-list" class="tab-content">
+            <div class="shopping-header">
+                <h2>Daftar Belanja Anda</h2>
+                <button id="clear-shopping-btn" class="btn btn-secondary btn-small">🗑️ Hapus Semua</button>
+            </div>
+            <div id="shopping-items" class="shopping-items">
+                <p class="empty-message">Belum ada item belanja. Klik tombol "Buat Daftar Belanja" di halaman Daftar Makanan untuk membuat daftar belanja Anda.</p>
+            </div>
+            <div class="shopping-stats">
+                <div class="stat">
+                    <span class="stat-label">Total Item:</span>
+                    <span id="total-items" class="stat-value">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Sudah Dibeli:</span>
+                    <span id="checked-items" class="stat-value">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Sisa:</span>
+                    <span id="remaining-items" class="stat-value">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal untuk menambah bahan -->
+    <div id="ingredient-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Tambah Bahan untuk <span id="modal-meal-name"></span></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="ingredient-form">
+                    <div class="input-group">
+                        <input type="text" id="ingredient-name" placeholder="Nama bahan (contoh: Ayam, Bawang Putih)" class="form-input">
+                        <input type="text" id="ingredient-quantity" placeholder="Jumlah (contoh: 1 kg, 3 siung)" class="form-input">
+                        <button id="add-ingredient-btn" class="btn btn-primary btn-small">Tambah</button>
+                    </div>
+                    <div id="ingredients-list" class="ingredients-list">
+                        <p class="empty-message-small">Belum ada bahan yang ditambahkan</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-ingredients-btn" class="btn btn-primary">Simpan</button>
+                <button id="cancel-ingredients-btn" class="btn btn-secondary">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tema -->
+    <div id="theme-modal" class="modal">
+        <div class="modal-content theme-modal-content">
+            <div class="modal-header">
+                <h2>🎨 Pilih Tema Warna</h2>
+                <button class="modal-close" id="close-theme-btn">&times;</button>
+            </div>
+            <div class="modal-body theme-body">
+                <div class="theme-grid">
+                    <div class="theme-option" data-theme="default">
+                        <div class="theme-preview theme-default">
+                            <div class="theme-color-box" style="background: linear-gradient(135deg, #ff6b6b, #ffa500, #ffd700);"></div>
+                        </div>
+                        <h3>Default</h3>
+                        <p>Merah - Orange - Kuning</p>
+                    </div>
+                    <div class="theme-option" data-theme="green">
+                        <div class="theme-preview theme-green">
+                            <div class="theme-color-box" style="background: linear-gradient(135deg, #11998e, #38ef7d, #a8e063);"></div>
+                        </div>
+                        <h3>Hijau</h3>
+                        <p>Hijau Segar</p>
+                    </div>
+                    <div class="theme-option" data-theme="blue">
+                        <div class="theme-preview theme-blue">
+                            <div class="theme-color-box" style="background: linear-gradient(135deg, #667eea, #764ba2, #a29bfe);"></div>
+                        </div>
+                        <h3>Biru</h3>
+                        <p>Biru - Ungu</p>
+                    </div>
+                    <div class="theme-option" data-theme="purple">
+                        <div class="theme-preview theme-purple">
+                            <div class="theme-color-box" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe, #fd79a8);"></div>
+                        </div>
+                        <h3>Ungu</h3>
+                        <p>Ungu - Pink</p>
+                    </div>
+                    <div class="theme-option" data-theme="orange">
+                        <div class="theme-preview theme-orange">
+                            <div class="theme-color-box" style="background: linear-gradient(135deg, #ff7675, #fdcb6e, #e17055);"></div>
+                        </div>
+                        <h3>Orange</h3>
+                        <p>Orange Hangat</p>
+                    </div>
+                    <div class="theme-option" data-theme="ocean">
+                        <div class="theme-preview theme-ocean">
+                            <div class="theme-color-box" style="background: linear-gradient(135deg, #0984e3, #74b9ff, #00b894);"></div>
+                        </div>
+                        <h3>Ocean</h3>
+                        <p>Biru Laut</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="close-theme-btn-bottom" class="btn btn-secondary">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Panduan -->
+    <div id="help-modal" class="modal">
+        <div class="modal-content help-modal-content">
+            <div class="modal-header">
+                <h2>📖 Cara Menggunakan Aplikasi</h2>
+                <button class="modal-close" id="close-help-btn">&times;</button>
+            </div>
+            <div class="modal-body help-body">
+                <div class="help-section">
+                    <h3>1️⃣ Isi Menu Makanan</h3>
+                    <p>Masukkan nama makanan untuk setiap hari dalam seminggu:</p>
+                    <ul>
+                        <li>Klik pada kotak input untuk mengetik nama makanan</li>
+                        <li>Isi untuk <strong>Sarapan</strong>, <strong>Makan Siang</strong>, dan <strong>Makan Malam</strong></li>
+                        <li>Contoh: "Nasi Goreng", "Ayam Bakar", "Sop Buntut"</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>2️⃣ Tambahkan Bahan-Bahan</h3>
+                    <p>Untuk setiap makanan, tambahkan bahan-bahan yang dibutuhkan:</p>
+                    <ul>
+                        <li>Klik tombol <span class="help-btn-example">📝</span> di sebelah kanan setiap input makanan</li>
+                        <li>Masukkan <strong>Nama Bahan</strong> (contoh: Ayam, Bawang Putih)</li>
+                        <li>Masukkan <strong>Jumlah</strong> (contoh: 1 kg, 3 siung, 2 sendok)</li>
+                        <li>Klik <strong>"Tambah"</strong> untuk menambahkan ke daftar</li>
+                        <li>Klik <strong>"Edit"</strong> jika ingin mengubah bahan yang sudah ditambahkan</li>
+                        <li>Klik <strong>"Simpan"</strong> setelah selesai menambahkan semua bahan</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>3️⃣ Buat Daftar Belanja</h3>
+                    <p>Setelah semua menu dan bahan diisi:</p>
+                    <ul>
+                        <li>Klik tombol <strong>"📋 Buat Daftar Belanja"</strong> di bagian bawah</li>
+                        <li>Aplikasi akan mengumpulkan semua bahan dari semua menu</li>
+                        <li>Bahan yang sama akan digabungkan secara otomatis</li>
+                        <li>Daftar belanja akan muncul di tab <strong>"Daftar Belanja"</strong></li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>4️⃣ Gunakan Daftar Belanja</h3>
+                    <p>Saat berbelanja:</p>
+                    <ul>
+                        <li>Buka tab <strong>"Daftar Belanja"</strong></li>
+                        <li>Centang ✅ item yang sudah dibeli</li>
+                        <li>Item yang sudah dicentang akan dicoret dan dihitung sebagai "Sudah Dibeli"</li>
+                        <li>Lihat statistik di bawah untuk mengetahui berapa item yang sudah dibeli dan sisa yang belum</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>5️⃣ Fitur Tambahan</h3>
+                    <ul>
+                        <li><strong>📥 Simpan Menu ke File:</strong> Ekspor semua menu dan bahan ke file teks</li>
+                        <li><strong>🗑️ Hapus Semua:</strong> Hapus semua menu atau daftar belanja</li>
+                        <li>Semua data otomatis tersimpan di browser Anda</li>
+                    </ul>
+                </div>
+
+                <div class="help-tip">
+                    <strong>💡 Tips:</strong> Anda bisa mengisi menu untuk beberapa hari terlebih dahulu, lalu tambahkan bahan-bahannya. Tidak perlu mengisi semua hari sekaligus!
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="close-help-btn-bottom" class="btn btn-primary">Mengerti, Terima Kasih!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Buttons -->
+    <div class="floating-buttons">
+        <button id="theme-btn" class="floating-btn" title="Ubah Tema" aria-label="Ubah Tema">
+            <span class="floating-btn-icon">🎨</span>
+            <span class="floating-btn-label">Tema</span>
+        </button>
+        <button id="help-btn" class="floating-btn floating-btn-help" title="Cara Menggunakan" aria-label="Bantuan">
+            <span class="floating-btn-icon">❓</span>
+            <span class="floating-btn-label">Bantuan</span>
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
