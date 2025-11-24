@@ -4,6 +4,7 @@ let shoppingList = [];
 let currentEditingMeal = null; // {day, meal}
 let currentIngredients = []; // Temporary storage for modal
 let editingIngredientId = null; // ID of ingredient being edited
+let shoppingFilter = 'all';
 
 const baseMeals = {
     sarapan: { label: 'Sarapan', placeholder: 'Sarapan' },
@@ -161,6 +162,11 @@ function setupEventListeners() {
             }
         });
     }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => setShoppingFilter(btn.dataset.filter || 'all'));
+    });
+    setShoppingFilter(shoppingFilter);
 
     // Clear buttons
     document.getElementById('clear-meals-btn').addEventListener('click', clearMealPlan);
@@ -892,7 +898,24 @@ function updateShoppingListDisplay() {
         return;
     }
     
-    container.innerHTML = shoppingList.map(item => `
+    const filteredItems = shoppingList.filter(item => {
+        if (shoppingFilter === 'checked') return item.checked;
+        if (shoppingFilter === 'remaining') return !item.checked;
+        return true;
+    });
+    
+    if (filteredItems.length === 0) {
+        const message = shoppingFilter === 'remaining'
+            ? 'Semua item sudah ditandai dibeli 🎉'
+            : shoppingFilter === 'checked'
+                ? 'Belum ada item yang ditandai dibeli.'
+                : 'Belum ada item belanja.';
+        container.innerHTML = `<p class="empty-message">${message}</p>`;
+        updateStats();
+        return;
+    }
+    
+    container.innerHTML = filteredItems.map(item => `
         <div class="shopping-item ${item.checked ? 'checked' : ''}">
             <input type="checkbox" id="item-${item.id}" ${item.checked ? 'checked' : ''} 
                    onchange="toggleItem(${item.id})">
@@ -926,6 +949,14 @@ function updateStats() {
     document.getElementById('total-items').textContent = total;
     document.getElementById('checked-items').textContent = checked;
     document.getElementById('remaining-items').textContent = remaining;
+}
+
+function setShoppingFilter(filter) {
+    shoppingFilter = filter || 'all';
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === shoppingFilter);
+    });
+    updateShoppingListDisplay();
 }
 
 // Save shopping list to localStorage
