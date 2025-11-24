@@ -778,6 +778,9 @@ header p {
 
     .filter-btn {
         width: 100%;
+        padding: 9px 12px;
+        font-size: 0.9em;
+        border-width: 1px;
     }
 
     .shopping-header h2 {
@@ -1021,6 +1024,15 @@ header p {
     .btn {
         padding: 10px 14px;
         font-size: 0.9em;
+    }
+
+    .shopping-filters {
+        gap: 8px;
+    }
+
+    .filter-btn {
+        padding: 8px 10px;
+        font-size: 0.8em;
     }
 
     .shopping-header h2 {
