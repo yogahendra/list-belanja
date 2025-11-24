@@ -158,6 +158,8 @@
             <div class="action-buttons">
                 <button id="generate-btn" class="btn btn-primary">📋 Buat Daftar Belanja</button>
                 <button id="export-menu-btn" class="btn btn-export">📥 Simpan Menu</button>
+                <button id="save-template-btn" class="btn btn-secondary">⭐ Simpan Menu Favorit</button>
+                <button id="open-template-btn" class="btn btn-secondary">📂 Favorit Saya</button>
                 <button id="clear-meals-btn" class="btn btn-secondary">🗑️ Hapus Semua</button>
             </div>
         </div>
@@ -328,6 +330,7 @@
                         <li>Masukkan <strong>Nama Bahan</strong> (contoh: Ayam, Bawang Putih)</li>
                         <li>Masukkan <strong>Jumlah</strong> (contoh: 1 kg, 3 siung, 2 sendok)</li>
                         <li>Klik <strong>"Tambah"</strong> untuk menambahkan ke daftar</li>
+                        <li>Ceklis <strong>"Sudah siap"</strong> jika bahan tersebut sudah tersedia di rumah agar tidak ikut daftar belanja</li>
                         <li>Klik <strong>"Edit"</strong> jika ingin mengubah bahan yang sudah ditambahkan</li>
                         <li>Klik <strong>"Simpan"</strong> setelah selesai menambahkan semua bahan</li>
                     </ul>
@@ -358,6 +361,8 @@
                 <div class="help-section">
                     <h3>5️⃣ Fitur Tambahan</h3>
                     <ul>
+                        <li><strong>⭐ Simpan Menu Favorit:</strong> Simpan kombinasi menu mingguan untuk digunakan ulang kapan saja</li>
+                        <li><strong>📂 Favorit Saya:</strong> Buka atau hapus daftar favorit yang sudah tersimpan</li>
                         <li><strong>📥 Simpan Menu ke File:</strong> Ekspor semua menu dan bahan ke file teks</li>
                         <li><strong>🗑️ Hapus Semua:</strong> Hapus semua menu atau daftar belanja</li>
                         <li>Semua data otomatis tersimpan di browser Anda</li>
@@ -405,6 +410,25 @@
             </div>
             <div class="modal-footer">
                 <button id="close-export-btn-bottom" class="btn btn-secondary">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Template Favorit -->
+    <div id="template-modal" class="modal">
+        <div class="modal-content template-modal-content">
+            <div class="modal-header">
+                <h2>⭐ Menu Favorit</h2>
+                <button class="modal-close" id="close-template-btn">&times;</button>
+            </div>
+            <div class="modal-body template-body">
+                <div id="template-empty" class="template-empty">
+                    <p>Belum ada menu favorit. Isi menu mingguan lalu klik <strong>"Simpan Menu Favorit"</strong>.</p>
+                </div>
+                <div id="template-list" class="template-list"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="close-template-btn-bottom" class="btn btn-secondary">Tutup</button>
             </div>
         </div>
     </div>
