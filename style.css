@@ -1248,6 +1248,26 @@ header p {
     gap: 8px;
 }
 
+.ingredient-ready-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 0.85em;
+    color: #666;
+}
+
+.ingredient-ready-toggle input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--theme-primary);
+}
+
+.ingredient-ready-note {
+    color: #27ae60;
+    font-weight: 600;
+}
+
 .btn-edit {
     background: linear-gradient(135deg, #6c5ce7, #a29bfe);
     color: white;
@@ -1388,6 +1408,10 @@ header p {
 
 .help-tip strong {
     color: #d68910;
+}
+
+.hidden {
+    display: none !important;
 }
 
 @media (max-width: 768px) {
@@ -1577,5 +1601,79 @@ header p {
     .export-icon {
         font-size: 2.5em;
     }
+}
+
+/* Template Modal Styles */
+.template-modal-content {
+    max-width: 620px;
+}
+
+.template-body {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.template-empty {
+    text-align: center;
+    color: #777;
+    padding: 18px;
+    border: 2px dashed #ddd;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.7);
+    margin-bottom: 15px;
+}
+
+.template-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.template-card {
+    border: 2px solid #f1f1f1;
+    border-radius: 12px;
+    padding: 15px;
+    background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.template-card h4 {
+    margin: 0 0 6px 0;
+    color: var(--theme-primary);
+    font-size: 1.1em;
+}
+
+.template-meta {
+    font-size: 0.85em;
+    color: #777;
+    margin-bottom: 10px;
+}
+
+.template-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-template-apply,
+.btn-template-delete {
+    flex: 1;
+    min-width: 140px;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-template-apply {
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+    color: white;
+}
+
+.btn-template-delete {
+    background: #ffe5e5;
+    color: #d63031;
 }
 
