@@ -102,9 +102,20 @@ function setupEventListeners() {
     });
 
     // Export button
-    document.getElementById('export-btn').addEventListener('click', () => {
+    document.getElementById('export-menu-btn').addEventListener('click', () => {
         hapticFeedback('light');
-        exportMealPlan();
+        showExportOptions();
+    });
+
+    // Export modal events
+    document.getElementById('close-export-btn').addEventListener('click', closeExportModal);
+    document.getElementById('close-export-btn-bottom').addEventListener('click', closeExportModal);
+    
+    // Close export modal when clicking outside
+    document.getElementById('export-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'export-modal') {
+            closeExportModal();
+        }
     });
 
     // Clear buttons
@@ -677,7 +688,512 @@ function loadTheme() {
     applyTheme(savedTheme);
 }
 
-// Export meal plan and ingredients
+// Show export options modal
+function showExportOptions() {
+    document.getElementById('export-modal').classList.add('active');
+}
+
+// Close export modal
+function closeExportModal() {
+    document.getElementById('export-modal').classList.remove('active');
+}
+
+// Export as HTML (Mobile-friendly)
+function exportAsHTML() {
+    closeExportModal();
+    hapticFeedback('medium');
+    
+    const days = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
+    const mealTypes = {
+        sarapan: 'Sarapan',
+        siang: 'Makan Siang',
+        malam: 'Makan Malam'
+    };
+    
+    let hasMeals = false;
+    let htmlContent = `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Menu Mingguan</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 15px;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #ff6b6b;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+        .day-section {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+        }
+        .day-section:last-child {
+            border-bottom: none;
+        }
+        .day-title {
+            color: #ff6b6b;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ff6b6b;
+        }
+        .meal-item {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #ffa500;
+        }
+        .meal-type {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        .meal-name {
+            color: #555;
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+        .ingredients {
+            margin-top: 8px;
+            padding-left: 15px;
+        }
+        .ingredients-title {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .ingredient {
+            font-size: 0.9em;
+            color: #666;
+            margin: 3px 0;
+        }
+        .shopping-summary {
+            margin-top: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #fff5f5, #ffe5e5);
+            border-radius: 10px;
+            border: 2px solid #ffd0d0;
+        }
+        .shopping-title {
+            color: #ff6b6b;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .shopping-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        .date {
+            text-align: center;
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛒 Daftar Menu Mingguan</h1>
+        <div class="subtitle">${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+`;
+
+    days.forEach(day => {
+        const dayName = day.charAt(0).toUpperCase() + day.slice(1);
+        let dayHtml = '';
+        let dayHasMeals = false;
+        
+        Object.keys(mealTypes).forEach(mealType => {
+            const key = `${day}_${mealType}`;
+            const meal = mealPlan[key];
+            
+            if (meal && meal.name) {
+                dayHasMeals = true;
+                hasMeals = true;
+                dayHtml += `
+                    <div class="meal-item">
+                        <div class="meal-type">${mealTypes[mealType]}</div>
+                        <div class="meal-name">${escapeHtml(meal.name)}</div>`;
+                
+                if (meal.ingredients && meal.ingredients.length > 0) {
+                    dayHtml += '<div class="ingredients">';
+                    dayHtml += '<div class="ingredients-title">Bahan-bahan:</div>';
+                    meal.ingredients.forEach(ing => {
+                        dayHtml += `<div class="ingredient">• ${escapeHtml(ing.name)} (${escapeHtml(ing.quantity)})</div>`;
+                    });
+                    dayHtml += '</div>';
+                }
+                dayHtml += '</div>';
+            }
+        });
+        
+        if (dayHasMeals) {
+            htmlContent += `
+        <div class="day-section">
+            <div class="day-title">${dayName.toUpperCase()}</div>
+            ${dayHtml}
+        </div>`;
+        }
+    });
+    
+    if (!hasMeals) {
+        alert('Belum ada menu makanan yang diisi. Isi menu terlebih dahulu!');
+        return;
+    }
+    
+    // Add shopping list summary
+    const ingredients = new Map();
+    Object.keys(mealPlan).forEach(key => {
+        const meal = mealPlan[key];
+        if (meal.ingredients && meal.ingredients.length > 0) {
+            meal.ingredients.forEach(ing => {
+                const normalized = normalizeIngredient(ing.name);
+                const existing = ingredients.get(normalized);
+                
+                if (existing) {
+                    existing.quantity = combineQuantities(existing.quantity, ing.quantity);
+                } else {
+                    ingredients.set(normalized, {
+                        name: ing.name,
+                        quantity: ing.quantity || '1'
+                    });
+                }
+            });
+        }
+    });
+    
+    htmlContent += `
+        <div class="shopping-summary">
+            <div class="shopping-title">📋 Ringkasan Bahan Belanja</div>`;
+    
+    if (ingredients.size > 0) {
+        Array.from(ingredients.values()).forEach(item => {
+            htmlContent += `<div class="shopping-item">• ${escapeHtml(item.name)} - ${escapeHtml(item.quantity)}</div>`;
+        });
+    } else {
+        htmlContent += '<div class="shopping-item" style="text-align:center;color:#999;">Belum ada bahan yang ditambahkan.</div>';
+    }
+    
+    htmlContent += `
+        </div>
+        <div class="date">Dibuat: ${new Date().toLocaleDateString('id-ID')}</div>
+    </div>
+</body>
+</html>`;
+    
+    // Download HTML file
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const date = new Date().toISOString().split('T')[0];
+    a.href = url;
+    a.download = `Daftar_Menu_${date}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert('Menu berhasil diekspor ke format HTML! File bisa dibuka di browser HP.');
+}
+
+// Export as PDF (using print to PDF)
+function exportAsPDF() {
+    closeExportModal();
+    hapticFeedback('medium');
+    
+    // Create temporary HTML for PDF
+    const days = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
+    const mealTypes = {
+        sarapan: 'Sarapan',
+        siang: 'Makan Siang',
+        malam: 'Makan Malam'
+    };
+    
+    let hasMeals = false;
+    let printContent = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto;">
+            <h1 style="color: #ff6b6b; text-align: center; margin-bottom: 10px;">🛒 Daftar Menu Mingguan</h1>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+    `;
+    
+    days.forEach(day => {
+        const dayName = day.charAt(0).toUpperCase() + day.slice(1);
+        let dayHtml = '';
+        let dayHasMeals = false;
+        
+        Object.keys(mealTypes).forEach(mealType => {
+            const key = `${day}_${mealType}`;
+            const meal = mealPlan[key];
+            
+            if (meal && meal.name) {
+                dayHasMeals = true;
+                hasMeals = true;
+                dayHtml += `
+                    <div style="margin-bottom: 15px; padding: 12px; background: #f9f9f9; border-radius: 8px; border-left: 4px solid #ffa500;">
+                        <div style="font-weight: bold; color: #333; margin-bottom: 5px;">${mealTypes[mealType]}</div>
+                        <div style="color: #555; margin-bottom: 8px;">${escapeHtml(meal.name)}</div>`;
+                
+                if (meal.ingredients && meal.ingredients.length > 0) {
+                    dayHtml += '<div style="margin-top: 8px; padding-left: 15px;">';
+                    dayHtml += '<div style="font-size: 0.9em; color: #888; margin-bottom: 5px;">Bahan-bahan:</div>';
+                    meal.ingredients.forEach(ing => {
+                        dayHtml += `<div style="font-size: 0.9em; color: #666; margin: 3px 0;">• ${escapeHtml(ing.name)} (${escapeHtml(ing.quantity)})</div>`;
+                    });
+                    dayHtml += '</div>';
+                }
+                dayHtml += '</div>';
+            }
+        });
+        
+        if (dayHasMeals) {
+            printContent += `
+            <div style="margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 20px;">
+                <h2 style="color: #ff6b6b; font-size: 1.4em; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #ff6b6b;">${dayName.toUpperCase()}</h2>
+                ${dayHtml}
+            </div>`;
+        }
+    });
+    
+    if (!hasMeals) {
+        alert('Belum ada menu makanan yang diisi. Isi menu terlebih dahulu!');
+        return;
+    }
+    
+    // Add shopping list
+    const ingredients = new Map();
+    Object.keys(mealPlan).forEach(key => {
+        const meal = mealPlan[key];
+        if (meal.ingredients && meal.ingredients.length > 0) {
+            meal.ingredients.forEach(ing => {
+                const normalized = normalizeIngredient(ing.name);
+                const existing = ingredients.get(normalized);
+                
+                if (existing) {
+                    existing.quantity = combineQuantities(existing.quantity, ing.quantity);
+                } else {
+                    ingredients.set(normalized, {
+                        name: ing.name,
+                        quantity: ing.quantity || '1'
+                    });
+                }
+            });
+        }
+    });
+    
+    printContent += `
+            <div style="margin-top: 40px; padding: 20px; background: #fff5f5; border-radius: 10px; border: 2px solid #ffd0d0;">
+                <h2 style="color: #ff6b6b; font-size: 1.5em; margin-bottom: 15px; text-align: center;">📋 Ringkasan Bahan Belanja</h2>`;
+    
+    if (ingredients.size > 0) {
+        Array.from(ingredients.values()).forEach(item => {
+            printContent += `<div style="padding: 8px; margin: 5px 0; background: white; border-radius: 5px;">• ${escapeHtml(item.name)} - ${escapeHtml(item.quantity)}</div>`;
+        });
+    }
+    
+    printContent += `
+            </div>
+            <p style="text-align: center; color: #999; font-size: 0.85em; margin-top: 20px;">Dibuat: ${new Date().toLocaleDateString('id-ID')}</p>
+        </div>
+    `;
+    
+    // Open print dialog
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Daftar Menu Mingguan</title>
+            <style>
+                @media print {
+                    @page { margin: 1cm; }
+                    body { margin: 0; padding: 0; }
+                }
+            </style>
+        </head>
+        <body>${printContent}</body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.onload = function() {
+        setTimeout(() => {
+            printWindow.print();
+            alert('Gunakan "Save as PDF" untuk menyimpan sebagai PDF!');
+        }, 250);
+    };
+}
+
+// Export as Text (original)
+function exportAsText() {
+    closeExportModal();
+    hapticFeedback('light');
+    exportMealPlan();
+}
+
+// Share menu (mobile-friendly)
+function shareMenu() {
+    closeExportModal();
+    hapticFeedback('medium');
+    
+    const days = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
+    const mealTypes = {
+        sarapan: 'Sarapan',
+        siang: 'Makan Siang',
+        malam: 'Makan Malam'
+    };
+    
+    let shareText = '🛒 *DAFTAR MENU MINGGUAN*\n\n';
+    let hasMeals = false;
+    
+    days.forEach(day => {
+        const dayName = day.charAt(0).toUpperCase() + day.slice(1);
+        let dayContent = '';
+        let dayHasMeals = false;
+        
+        Object.keys(mealTypes).forEach(mealType => {
+            const key = `${day}_${mealType}`;
+            const meal = mealPlan[key];
+            
+            if (meal && meal.name) {
+                dayHasMeals = true;
+                hasMeals = true;
+                dayContent += `${mealTypes[mealType]}: ${meal.name}\n`;
+                
+                if (meal.ingredients && meal.ingredients.length > 0) {
+                    dayContent += 'Bahan: ';
+                    const ingList = meal.ingredients.map(ing => `${ing.name} (${ing.quantity})`).join(', ');
+                    dayContent += ingList + '\n';
+                }
+                dayContent += '\n';
+            }
+        });
+        
+        if (dayHasMeals) {
+            shareText += `*${dayName.toUpperCase()}*\n${dayContent}`;
+        }
+    });
+    
+    if (!hasMeals) {
+        alert('Belum ada menu makanan yang diisi. Isi menu terlebih dahulu!');
+        return;
+    }
+    
+    // Add shopping list
+    const ingredients = new Map();
+    Object.keys(mealPlan).forEach(key => {
+        const meal = mealPlan[key];
+        if (meal.ingredients && meal.ingredients.length > 0) {
+            meal.ingredients.forEach(ing => {
+                const normalized = normalizeIngredient(ing.name);
+                const existing = ingredients.get(normalized);
+                
+                if (existing) {
+                    existing.quantity = combineQuantities(existing.quantity, ing.quantity);
+                } else {
+                    ingredients.set(normalized, {
+                        name: ing.name,
+                        quantity: ing.quantity || '1'
+                    });
+                }
+            });
+        }
+    });
+    
+    shareText += '\n📋 *RINGKASAN BAHAN BELANJA*\n\n';
+    
+    if (ingredients.size > 0) {
+        Array.from(ingredients.values()).forEach(item => {
+            shareText += `• ${item.name} - ${item.quantity}\n`;
+        });
+    }
+    
+    // Use Web Share API if available
+    if (navigator.share) {
+        navigator.share({
+            title: 'Daftar Menu Mingguan',
+            text: shareText
+        }).catch(() => {
+            // Fallback to copy
+            copyToClipboard(shareText);
+        });
+    } else {
+        // Fallback: copy to clipboard
+        copyToClipboard(shareText);
+    }
+}
+
+// Copy to clipboard helper
+function copyToClipboard(text) {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Menu berhasil disalin ke clipboard! Bisa paste di WhatsApp, Email, dll.');
+        }).catch(() => {
+            fallbackCopy(text);
+        });
+    } else {
+        fallbackCopy(text);
+    }
+}
+
+// Fallback copy method
+function fallbackCopy(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        alert('Menu berhasil disalin! Bisa paste di WhatsApp, Email, dll.');
+    } catch (err) {
+        alert('Gagal menyalin. Silakan copy manual dari teks yang akan muncul.');
+        prompt('Copy teks berikut:', text);
+    }
+    document.body.removeChild(textarea);
+}
+
+// Escape HTML helper
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Make functions available globally
+window.exportAsHTML = exportAsHTML;
+window.exportAsPDF = exportAsPDF;
+window.exportAsText = exportAsText;
+window.shareMenu = shareMenu;
+
+// Export meal plan and ingredients (Text format - original)
 function exportMealPlan() {
     const days = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
     const mealTypes = {
