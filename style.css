@@ -590,6 +590,7 @@ header p {
 @media (max-width: 768px) {
     body {
         padding: 8px;
+        padding-bottom: 110px;
     }
 
     .container {
@@ -794,6 +795,75 @@ header p {
 
     .theme-option p {
         font-size: 0.8em;
+    }
+}
+
+@media (max-width: 640px) {
+    .floating-buttons {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        flex-direction: row;
+        width: calc(100% - 30px);
+        max-width: 360px;
+        background: rgba(255, 255, 255, 0.35);
+        backdrop-filter: blur(12px);
+        padding: 8px 12px;
+        border-radius: 999px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .floating-btn {
+        flex: 1;
+        min-width: 0;
+        height: 46px;
+        border-radius: 999px;
+        padding: 0 14px;
+        font-size: 0.85em;
+        gap: 6px;
+    }
+
+    .floating-btn-label {
+        display: inline;
+        font-size: 0.8em;
+    }
+
+    .tabs {
+        gap: 8px;
+        padding: 6px;
+        border-bottom: none;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.7);
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        flex: 1 1 calc(50% - 8px);
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .tab-btn.active {
+        border-bottom: none;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .shopping-stats {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .stat {
+        display: flex;
+        justify-content: space-between;
+        text-align: left;
+    }
+
+    .stat-value {
+        font-size: 1.3em;
     }
 }
 
