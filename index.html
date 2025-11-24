@@ -170,6 +170,11 @@
                 <h2>Daftar Belanja Anda</h2>
                 <button id="clear-shopping-btn" class="btn btn-secondary btn-small">🗑️ Hapus Semua</button>
             </div>
+            <div class="shopping-filters" role="group" aria-label="Filter daftar belanja">
+                <button class="filter-btn active" data-filter="all">Semua</button>
+                <button class="filter-btn" data-filter="remaining">Belum Dibeli</button>
+                <button class="filter-btn" data-filter="checked">Sudah Dibeli</button>
+            </div>
             <div id="shopping-items" class="shopping-items">
                 <p class="empty-message">Belum ada item belanja. Klik tombol "Buat Daftar Belanja" di halaman Daftar Makanan untuk membuat daftar belanja Anda.</p>
             </div>
@@ -361,6 +366,7 @@
                 <div class="help-section">
                     <h3>5️⃣ Fitur Tambahan</h3>
                     <ul>
+                        <li><strong>🔍 Filter Daftar Belanja:</strong> Tampilkan semua, hanya yang belum dibeli, atau yang sudah dibeli</li>
                         <li><strong>⭐ Simpan Menu Favorit:</strong> Simpan kombinasi menu mingguan untuk digunakan ulang kapan saja</li>
                         <li><strong>📂 Favorit Saya:</strong> Buka atau hapus daftar favorit yang sudah tersimpan</li>
                         <li><strong>📥 Simpan Menu ke File:</strong> Ekspor semua menu dan bahan ke file teks</li>
