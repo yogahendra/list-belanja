@@ -501,23 +501,26 @@ header p {
 }
 
 .shopping-filters {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
     margin-bottom: 15px;
 }
 
 .filter-btn {
-    flex: 1 1 140px;
-    padding: 10px 14px;
-    border-radius: 18px;
+    padding: 8px 10px;
+    border-radius: 14px;
     border: 1px solid rgba(0, 0, 0, 0.08);
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.9);
     cursor: pointer;
     font-weight: 600;
-    font-size: 0.95em;
+    font-size: 0.9em;
     color: #555;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .filter-btn.active {
@@ -773,17 +776,16 @@ header p {
     }
 
     .shopping-filters {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-        gap: 8px;
+        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+        gap: 6px;
         width: 100%;
     }
 
     .filter-btn {
-        width: 100%;
-        padding: 8px 10px;
-        font-size: 0.85em;
-        border-radius: 14px;
+        padding: 7px 9px;
+        font-size: 0.82em;
+        min-height: 36px;
+        border-radius: 12px;
     }
 
     .shopping-header h2 {
@@ -1029,13 +1031,10 @@ header p {
         font-size: 0.9em;
     }
 
-    .shopping-filters {
-        gap: 6px;
-    }
-
     .filter-btn {
-        padding: 7px 9px;
+        padding: 6px 8px;
         font-size: 0.78em;
+        min-height: 32px;
     }
 
     .shopping-filters {
