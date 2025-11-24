@@ -670,6 +670,66 @@ function applyTheme(themeName) {
             '--theme-day-jumat': '#55efc4',
             '--theme-day-sabtu': '#81ecec',
             '--theme-day-minggu': '#a8e6cf'
+        },
+        pastel: {
+            '--theme-primary': '#ff9aa2',
+            '--theme-secondary': '#ffb7b2',
+            '--theme-accent': '#ffdac1',
+            '--theme-bg-start': '#fff0f3',
+            '--theme-bg-end': '#fef9f9',
+            '--theme-header': 'linear-gradient(135deg, #ff9aa2 0%, #ffb7b2 50%, #ffdac1 100%)',
+            '--theme-day-senin': '#ff9aa2',
+            '--theme-day-selasa': '#ffb7b2',
+            '--theme-day-rabu': '#ffdac1',
+            '--theme-day-kamis': '#c7ceea',
+            '--theme-day-jumat': '#f6a6ff',
+            '--theme-day-sabtu': '#bee3db',
+            '--theme-day-minggu': '#cdeac0'
+        },
+        forest: {
+            '--theme-primary': '#2d6a4f',
+            '--theme-secondary': '#40916c',
+            '--theme-accent': '#95d5b2',
+            '--theme-bg-start': '#d8f3dc',
+            '--theme-bg-end': '#f4fdf6',
+            '--theme-header': 'linear-gradient(135deg, #2d6a4f 0%, #40916c 50%, #95d5b2 100%)',
+            '--theme-day-senin': '#2d6a4f',
+            '--theme-day-selasa': '#1b4332',
+            '--theme-day-rabu': '#40916c',
+            '--theme-day-kamis': '#52b788',
+            '--theme-day-jumat': '#74c69d',
+            '--theme-day-sabtu': '#95d5b2',
+            '--theme-day-minggu': '#b7e4c7'
+        },
+        sunset: {
+            '--theme-primary': '#ff7e5f',
+            '--theme-secondary': '#feb47b',
+            '--theme-accent': '#ffd194',
+            '--theme-bg-start': '#ffe1c6',
+            '--theme-bg-end': '#fff2e0',
+            '--theme-header': 'linear-gradient(135deg, #ff7e5f 0%, #feb47b 50%, #ffd194 100%)',
+            '--theme-day-senin': '#ff7e5f',
+            '--theme-day-selasa': '#feb47b',
+            '--theme-day-rabu': '#ff6f61',
+            '--theme-day-kamis': '#f5a25d',
+            '--theme-day-jumat': '#f7797d',
+            '--theme-day-sabtu': '#ffd194',
+            '--theme-day-minggu': '#ffe29f'
+        },
+        midnight: {
+            '--theme-primary': '#1e3c72',
+            '--theme-secondary': '#2a5298',
+            '--theme-accent': '#243b55',
+            '--theme-bg-start': '#0f2027',
+            '--theme-bg-end': '#2c5364',
+            '--theme-header': 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)',
+            '--theme-day-senin': '#1a2980',
+            '--theme-day-selasa': '#26d0ce',
+            '--theme-day-rabu': '#2c5364',
+            '--theme-day-kamis': '#1f4037',
+            '--theme-day-jumat': '#4b79a1',
+            '--theme-day-sabtu': '#283e51',
+            '--theme-day-minggu': '#537895'
         }
     };
 
