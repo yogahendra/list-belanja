@@ -1496,11 +1496,6 @@ window.shareMenu = shareMenu;
 // Export meal plan and ingredients (Text format - original)
 function exportMealPlan() {
     const days = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
-    const mealTypes = {
-        sarapan: 'Sarapan',
-        siang: 'Makan Siang',
-        malam: 'Makan Malam'
-    };
     
     let hasMeals = false;
     const dateStr = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -1516,14 +1511,12 @@ function exportMealPlan() {
         let dayContent = [];
         let dayHasMeals = false;
         
-        Object.keys(mealTypes).forEach(mealType => {
-            const key = `${day}_${mealType}`;
-            const meal = mealPlan[key];
-            
-            if (meal && meal.name) {
+        const meals = getMealsForDay(day);
+        meals.forEach(meal => {
+            if (meal.name) {
                 dayHasMeals = true;
                 hasMeals = true;
-                dayContent.push(`  ${mealTypes[mealType]}`);
+                dayContent.push(`  ${meal.label}`);
                 dayContent.push(`  ${meal.name}`);
                 
                 if (meal.ingredients && meal.ingredients.length > 0) {
