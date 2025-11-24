@@ -12,6 +12,9 @@ const baseMeals = {
 };
 
 let customMealSlots = {};
+let mealTemplates = [];
+const CUSTOM_SLOT_STORAGE_KEY = 'customMealSlots';
+const TEMPLATE_STORAGE_KEY = 'mealTemplates';
 
 // Capacitor imports (will be undefined in browser)
 let App, Haptics, Keyboard, StatusBar;
@@ -124,6 +127,40 @@ function setupEventListeners() {
             closeExportModal();
         }
     });
+    
+    // Template buttons
+    const saveTemplateBtn = document.getElementById('save-template-btn');
+    if (saveTemplateBtn) {
+        saveTemplateBtn.addEventListener('click', () => {
+            hapticFeedback('light');
+            handleSaveTemplate();
+        });
+    }
+
+    const openTemplateBtn = document.getElementById('open-template-btn');
+    if (openTemplateBtn) {
+        openTemplateBtn.addEventListener('click', () => {
+            hapticFeedback('light');
+            openTemplateModal();
+        });
+    }
+
+    const closeTemplateBtn = document.getElementById('close-template-btn');
+    if (closeTemplateBtn) {
+        closeTemplateBtn.addEventListener('click', closeTemplateModal);
+    }
+    const closeTemplateBtnBottom = document.getElementById('close-template-btn-bottom');
+    if (closeTemplateBtnBottom) {
+        closeTemplateBtnBottom.addEventListener('click', closeTemplateModal);
+    }
+    const templateModal = document.getElementById('template-modal');
+    if (templateModal) {
+        templateModal.addEventListener('click', (e) => {
+            if (e.target.id === 'template-modal') {
+                closeTemplateModal();
+            }
+        });
+    }
 
     // Clear buttons
     document.getElementById('clear-meals-btn').addEventListener('click', clearMealPlan);
@@ -192,6 +229,131 @@ function setupEventListeners() {
 
     // Load saved theme
     loadTheme();
+}
+
+function openTemplateModal() {
+    renderTemplateList();
+    document.getElementById('template-modal').classList.add('active');
+}
+
+function closeTemplateModal() {
+    document.getElementById('template-modal').classList.remove('active');
+}
+
+function handleSaveTemplate() {
+    saveMealPlan();
+    if (!hasAnyMealFilled()) {
+        alert('Isi minimal satu menu terlebih dahulu sebelum menyimpan favorit.');
+        return;
+    }
+    const defaultName = `Menu Favorit ${new Date().toLocaleDateString('id-ID')}`;
+    let name = prompt('Nama menu favorit:', defaultName);
+    if (name === null) return;
+    name = name.trim() || defaultName;
+    
+    const templateData = {
+        id: Date.now().toString(),
+        name,
+        mealPlan: JSON.parse(JSON.stringify(mealPlan)),
+        customSlots: JSON.parse(JSON.stringify(customMealSlots)),
+        createdAt: new Date().toISOString()
+    };
+    
+    mealTemplates.unshift(templateData);
+    saveMealTemplates();
+    renderTemplateList();
+    alert('Menu favorit berhasil disimpan!');
+}
+
+function renderTemplateList() {
+    const listEl = document.getElementById('template-list');
+    const emptyEl = document.getElementById('template-empty');
+    if (!listEl || !emptyEl) return;
+    
+    if (!mealTemplates.length) {
+        emptyEl.classList.remove('hidden');
+        listEl.innerHTML = '';
+        return;
+    }
+    
+    emptyEl.classList.add('hidden');
+    listEl.innerHTML = mealTemplates.map(template => {
+        const mealCount = Object.values(template.mealPlan || {}).filter(item => item && item.name && item.name.trim()).length;
+        const slotCount = Object.keys(template.customSlots || {}).reduce((total, day) => total + (template.customSlots[day]?.length || 0), 0);
+        const createdLabel = template.createdAt ? new Date(template.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
+        return `
+            <div class="template-card">
+                <h4>${escapeHtml(template.name)}</h4>
+                <div class="template-meta">Disimpan: ${createdLabel} • ${mealCount} menu terisi${slotCount ? ` • ${slotCount} slot tambahan` : ''}</div>
+                <div class="template-actions">
+                    <button class="btn-template-apply" data-template-id="${template.id}">Gunakan</button>
+                    <button class="btn-template-delete" data-template-id="${template.id}">Hapus</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    listEl.querySelectorAll('.btn-template-apply').forEach(btn => {
+        btn.addEventListener('click', () => applyTemplate(btn.dataset.templateId));
+    });
+    listEl.querySelectorAll('.btn-template-delete').forEach(btn => {
+        btn.addEventListener('click', () => deleteTemplate(btn.dataset.templateId));
+    });
+}
+
+function applyTemplate(templateId) {
+    const template = mealTemplates.find(t => String(t.id) === String(templateId));
+    if (!template) return;
+    if (hasAnyMealFilled() && !confirm('Menerapkan favorit akan mengganti menu yang sedang ditulis. Lanjutkan?')) {
+        return;
+    }
+    
+    mealPlan = JSON.parse(JSON.stringify(template.mealPlan || {}));
+    customMealSlots = JSON.parse(JSON.stringify(template.customSlots || {}));
+    localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+    saveCustomMealSlots();
+    
+    removeCustomSlotElements();
+    loadCustomMealSlots();
+    
+    document.querySelectorAll('.meal-input').forEach(input => {
+        input.value = '';
+        const base = baseMeals[input.dataset.meal];
+        if (base) {
+            input.dataset.mealLabel = base.label;
+        }
+    });
+    
+    ensureSlotsForSavedMeals();
+    document.querySelectorAll('.meal-input').forEach(input => {
+        const key = `${input.dataset.day}_${input.dataset.meal}`;
+        if (mealPlan[key]) {
+            if (mealPlan[key].name) {
+                input.value = mealPlan[key].name;
+            }
+            if (mealPlan[key].slotLabel) {
+                input.dataset.mealLabel = mealPlan[key].slotLabel;
+            }
+        }
+    });
+    
+    saveMealPlan();
+    renderTemplateList();
+    closeTemplateModal();
+    alert(`Menu favorit "${template.name}" berhasil diterapkan!`);
+}
+
+function deleteTemplate(templateId) {
+    const template = mealTemplates.find(t => String(t.id) === String(templateId));
+    if (!template) return;
+    if (!confirm(`Hapus menu favorit "${template.name}"?`)) return;
+    mealTemplates = mealTemplates.filter(t => String(t.id) !== String(templateId));
+    saveMealTemplates();
+    renderTemplateList();
+}
+
+function hasAnyMealFilled() {
+    return Object.values(mealPlan).some(item => item && item.name && item.name.trim());
 }
 
 function registerMealInput(input) {
@@ -322,11 +484,11 @@ function removeCustomMealSlot(day, mealKey) {
 }
 
 function saveCustomMealSlots() {
-    localStorage.setItem('customMealSlots', JSON.stringify(customMealSlots));
+    localStorage.setItem(CUSTOM_SLOT_STORAGE_KEY, JSON.stringify(customMealSlots));
 }
 
 function loadCustomMealSlots() {
-    const saved = localStorage.getItem('customMealSlots');
+    const saved = localStorage.getItem(CUSTOM_SLOT_STORAGE_KEY);
     if (saved) {
         try {
             customMealSlots = JSON.parse(saved) || {};
@@ -377,6 +539,21 @@ function ensureSlotsForSavedMeals() {
     saveCustomMealSlots();
 }
 
+function loadMealTemplates() {
+    const saved = localStorage.getItem(TEMPLATE_STORAGE_KEY);
+    if (saved) {
+        try {
+            mealTemplates = JSON.parse(saved) || [];
+        } catch (e) {
+            mealTemplates = [];
+        }
+    }
+}
+
+function saveMealTemplates() {
+    localStorage.setItem(TEMPLATE_STORAGE_KEY, JSON.stringify(mealTemplates));
+}
+
 function getMealsForDay(day) {
     const inputs = document.querySelectorAll(`.meal-input[data-day="${day}"]`);
     return Array.from(inputs).map(input => {
@@ -418,7 +595,12 @@ function openIngredientModal(day, meal) {
     
     // Load existing ingredients
     const key = `${day}_${meal}`;
-    currentIngredients = mealPlan[key]?.ingredients || [];
+    currentIngredients = mealPlan[key]?.ingredients
+        ? mealPlan[key].ingredients.map(ing => ({
+            ...ing,
+            ready: Boolean(ing.ready)
+        }))
+        : [];
     updateIngredientsListDisplay();
     
     // Clear input fields and reset edit mode
@@ -464,7 +646,8 @@ function addIngredientToModal() {
         currentIngredients.push({
             id: Date.now() + Math.random(),
             name: name,
-            quantity: quantity || '1'
+            quantity: quantity || '1',
+            ready: false
         });
     }
     
@@ -513,6 +696,7 @@ function editIngredientFromModal(id) {
 // Make functions available globally
 window.removeIngredientFromModal = removeIngredientFromModal;
 window.editIngredientFromModal = editIngredientFromModal;
+window.toggleIngredientReady = toggleIngredientReady;
 
 // Update ingredients list display in modal
 function updateIngredientsListDisplay() {
@@ -526,8 +710,12 @@ function updateIngredientsListDisplay() {
     container.innerHTML = currentIngredients.map(ing => `
         <div class="ingredient-item ${editingIngredientId === ing.id ? 'editing' : ''}">
             <div class="ingredient-info">
-                <div class="ingredient-name">${ing.name}</div>
-                <div class="ingredient-quantity">${ing.quantity}</div>
+                <div class="ingredient-name">${escapeHtml(ing.name)}</div>
+                <div class="ingredient-quantity">${escapeHtml(ing.quantity)}${ing.ready ? ' • <span class="ingredient-ready-note">Sudah siap</span>' : ''}</div>
+                <div class="ingredient-ready-toggle">
+                    <input type="checkbox" id="ready-${ing.id}" ${ing.ready ? 'checked' : ''} onchange="toggleIngredientReady(${ing.id}, this.checked)">
+                    <label for="ready-${ing.id}">Sudah siap / stok ada</label>
+                </div>
             </div>
             <div class="ingredient-actions">
                 <button class="btn-edit" onclick="editIngredientFromModal(${ing.id})">Edit</button>
@@ -535,6 +723,14 @@ function updateIngredientsListDisplay() {
             </div>
         </div>
     `).join('');
+}
+
+function toggleIngredientReady(id, isReady) {
+    const ingredient = currentIngredients.find(ing => ing.id === id);
+    if (ingredient) {
+        ingredient.ready = Boolean(isReady);
+        updateIngredientsListDisplay();
+    }
 }
 
 // Save ingredients to meal plan
@@ -548,7 +744,7 @@ function saveIngredients() {
         mealPlan[key] = {};
     }
     
-    mealPlan[key].ingredients = [...currentIngredients];
+    mealPlan[key].ingredients = currentIngredients.map(ing => ({ ...ing }));
     mealPlan[key].slotLabel = getMealLabel(day, meal);
     saveMealPlan();
     closeIngredientModal();
@@ -613,6 +809,9 @@ function generateShoppingList() {
         const meal = mealPlan[key];
         if (meal.ingredients && meal.ingredients.length > 0) {
             meal.ingredients.forEach(ing => {
+                if (ing.ready) {
+                    return;
+                }
                 const normalized = normalizeIngredient(ing.name);
                 const existing = ingredients.get(normalized);
                 
@@ -756,18 +955,12 @@ function clearMealPlan() {
     }
 }
 
+function removeCustomSlotElements() {
+    document.querySelectorAll('.meal-item.custom-slot').forEach(item => item.remove());
+}
+
 function removeAllCustomMealSlots() {
-    Object.keys(customMealSlots).forEach(day => {
-        customMealSlots[day].forEach(slot => {
-            const input = document.querySelector(`.meal-input[data-day="${day}"][data-meal="${slot.id}"]`);
-            if (input) {
-                const wrapper = input.closest('.meal-item');
-                if (wrapper) {
-                    wrapper.remove();
-                }
-            }
-        });
-    });
+    removeCustomSlotElements();
     customMealSlots = {};
 }
 
@@ -782,6 +975,7 @@ function clearShoppingList() {
 
 // Load all data
 function loadData() {
+    loadMealTemplates();
     loadCustomMealSlots();
     loadMealPlan();
     loadShoppingList();
@@ -1150,7 +1344,8 @@ function exportAsHTML() {
                     dayHtml += '<div class="ingredients">';
                     dayHtml += '<div class="ingredients-title">Bahan:</div>';
                     meal.ingredients.forEach(ing => {
-                        dayHtml += `<div class="ingredient">• ${escapeHtml(ing.name)} - ${escapeHtml(ing.quantity)}</div>`;
+                        const readyNote = ing.ready ? ' (sudah siap)' : '';
+                        dayHtml += `<div class="ingredient">• ${escapeHtml(ing.name)} - ${escapeHtml(ing.quantity)}${readyNote}</div>`;
                     });
                     dayHtml += '</div>';
                 }
@@ -1178,6 +1373,7 @@ function exportAsHTML() {
         const meal = mealPlan[key];
         if (meal.ingredients && meal.ingredients.length > 0) {
             meal.ingredients.forEach(ing => {
+                if (ing.ready) return;
                 const normalized = normalizeIngredient(ing.name);
                 const existing = ingredients.get(normalized);
                 
@@ -1265,7 +1461,8 @@ function exportAsPDF() {
                     dayHtml += '<div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #e0e0e0;">';
                     dayHtml += '<div style="font-size: 0.85em; color: #888; margin-bottom: 6px; font-weight: 500;">Bahan:</div>';
                     meal.ingredients.forEach(ing => {
-                        dayHtml += `<div style="font-size: 0.9em; color: #666; margin: 4px 0; padding-left: 8px;">• ${escapeHtml(ing.name)} - ${escapeHtml(ing.quantity)}</div>`;
+                        const readyNote = ing.ready ? ' (sudah siap)' : '';
+                        dayHtml += `<div style="font-size: 0.9em; color: #666; margin: 4px 0; padding-left: 8px;">• ${escapeHtml(ing.name)} - ${escapeHtml(ing.quantity)}${readyNote}</div>`;
                     });
                     dayHtml += '</div>';
                 }
@@ -1293,6 +1490,7 @@ function exportAsPDF() {
         const meal = mealPlan[key];
         if (meal.ingredients && meal.ingredients.length > 0) {
             meal.ingredients.forEach(ing => {
+                if (ing.ready) return;
                 const normalized = normalizeIngredient(ing.name);
                 const existing = ingredients.get(normalized);
                 
@@ -1385,7 +1583,9 @@ function shareMenu() {
                 dayContent.push(`${meal.label}: ${meal.name}`);
                 
                 if (meal.ingredients && meal.ingredients.length > 0) {
-                    const ingList = meal.ingredients.map(ing => `${ing.name} (${ing.quantity})`).join(', ');
+                    const ingList = meal.ingredients
+                        .map(ing => `${ing.name} (${ing.quantity})${ing.ready ? ' [sudah siap]' : ''}`)
+                        .join(', ');
                     dayContent.push(`Bahan: ${ingList}`);
                 }
             }
@@ -1408,6 +1608,7 @@ function shareMenu() {
         const meal = mealPlan[key];
         if (meal.ingredients && meal.ingredients.length > 0) {
             meal.ingredients.forEach(ing => {
+                if (ing.ready) return;
                 const normalized = normalizeIngredient(ing.name);
                 const existing = ingredients.get(normalized);
                 
@@ -1521,7 +1722,8 @@ function exportMealPlan() {
                 
                 if (meal.ingredients && meal.ingredients.length > 0) {
                     meal.ingredients.forEach(ing => {
-                        dayContent.push(`    • ${ing.name} - ${ing.quantity}`);
+                        const readyNote = ing.ready ? ' (sudah siap)' : '';
+                        dayContent.push(`    • ${ing.name} - ${ing.quantity}${readyNote}`);
                     });
                 }
                 dayContent.push('');
@@ -1546,6 +1748,7 @@ function exportMealPlan() {
         const meal = mealPlan[key];
         if (meal.ingredients && meal.ingredients.length > 0) {
             meal.ingredients.forEach(ing => {
+                if (ing.ready) return;
                 const normalized = normalizeIngredient(ing.name);
                 const existing = ingredients.get(normalized);
                 
