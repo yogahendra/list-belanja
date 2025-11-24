@@ -508,15 +508,16 @@ header p {
 }
 
 .filter-btn {
-    flex: 1 1 120px;
-    padding: 10px 16px;
-    border-radius: 999px;
-    border: 2px solid rgba(0, 0, 0, 0.08);
-    background: rgba(255, 255, 255, 0.8);
+    flex: 1 1 140px;
+    padding: 10px 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.85);
     cursor: pointer;
     font-weight: 600;
-    color: #666;
-    transition: all 0.3s ease;
+    font-size: 0.95em;
+    color: #555;
+    transition: all 0.25s ease;
 }
 
 .filter-btn.active {
@@ -772,15 +773,17 @@ header p {
     }
 
     .shopping-filters {
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+        gap: 8px;
         width: 100%;
     }
 
     .filter-btn {
         width: 100%;
-        padding: 9px 12px;
-        font-size: 0.9em;
-        border-width: 1px;
+        padding: 8px 10px;
+        font-size: 0.85em;
+        border-radius: 14px;
     }
 
     .shopping-header h2 {
@@ -1024,6 +1027,15 @@ header p {
     .btn {
         padding: 10px 14px;
         font-size: 0.9em;
+    }
+
+    .shopping-filters {
+        gap: 6px;
+    }
+
+    .filter-btn {
+        padding: 7px 9px;
+        font-size: 0.78em;
     }
 
     .shopping-filters {
