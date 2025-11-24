@@ -3,7 +3,7 @@
   "short_name": "Daftar Belanja",
   "description": "Rencanakan menu makanan seminggu ke depan dan buat daftar belanja dengan mudah",
   "start_url": "./index.html",
-  "display": "standalone",
+  "display": "browser",
   "background_color": "#ff9a9e",
   "theme_color": "#ff6b6b",
   "orientation": "portrait",
