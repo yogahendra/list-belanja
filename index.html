@@ -150,7 +150,7 @@
             </div>
             <div class="action-buttons">
                 <button id="generate-btn" class="btn btn-primary">📋 Buat Daftar Belanja</button>
-                <button id="export-btn" class="btn btn-export">📥 Simpan Menu ke File</button>
+                <button id="export-menu-btn" class="btn btn-export">📥 Simpan Menu</button>
                 <button id="clear-meals-btn" class="btn btn-secondary">🗑️ Hapus Semua</button>
             </div>
         </div>
@@ -334,6 +334,41 @@
             </div>
             <div class="modal-footer">
                 <button id="close-help-btn-bottom" class="btn btn-primary">Mengerti, Terima Kasih!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Export Options -->
+    <div id="export-modal" class="modal">
+        <div class="modal-content export-modal-content">
+            <div class="modal-header">
+                <h2>📥 Pilih Format Export</h2>
+                <button class="modal-close" id="close-export-btn">&times;</button>
+            </div>
+            <div class="modal-body export-options">
+                <div class="export-option" onclick="exportAsHTML()">
+                    <div class="export-icon">🌐</div>
+                    <h3>HTML (Web)</h3>
+                    <p>Format web yang mudah dibuka di HP dan komputer</p>
+                </div>
+                <div class="export-option" onclick="exportAsPDF()">
+                    <div class="export-icon">📄</div>
+                    <h3>PDF</h3>
+                    <p>File PDF yang bisa dibuka di semua device</p>
+                </div>
+                <div class="export-option" onclick="exportAsText()">
+                    <div class="export-icon">📝</div>
+                    <h3>Teks (TXT)</h3>
+                    <p>File teks sederhana</p>
+                </div>
+                <div class="export-option" onclick="shareMenu()">
+                    <div class="export-icon">📤</div>
+                    <h3>Share / Kirim</h3>
+                    <p>Bagikan via WhatsApp, Email, dll</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="close-export-btn-bottom" class="btn btn-secondary">Batal</button>
             </div>
         </div>
     </div>
