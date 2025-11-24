@@ -800,34 +800,32 @@ header p {
 
 @media (max-width: 640px) {
     .floating-buttons {
-        left: 50%;
-        right: auto;
-        transform: translateX(-50%);
-        flex-direction: row;
-        width: calc(100% - 30px);
-        max-width: 360px;
-        background: rgba(255, 255, 255, 0.35);
-        backdrop-filter: blur(12px);
-        padding: 8px 12px;
-        border-radius: 999px;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-        justify-content: center;
-        gap: 10px;
+        left: auto;
+        right: 15px;
+        bottom: 15px;
+        transform: none;
+        flex-direction: column;
+        width: auto;
+        max-width: none;
+        background: none;
+        backdrop-filter: none;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        gap: 8px;
     }
 
     .floating-btn {
-        flex: 1;
-        min-width: 0;
-        height: 46px;
-        border-radius: 999px;
-        padding: 0 14px;
+        min-width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        padding: 10px;
         font-size: 0.85em;
-        gap: 6px;
+        gap: 4px;
     }
 
     .floating-btn-label {
-        display: inline;
-        font-size: 0.8em;
+        display: none;
     }
 
     .tabs {
